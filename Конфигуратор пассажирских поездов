@@ -18,7 +18,7 @@ public class Direction
     public string NameStartPoint { get; private set; }
     public string NameEndPoint { get; private set; }
 
-    public void ShowInfoDirection()
+    public void ShowInfo()
     {
         Console.WriteLine($"Поезд следует из {NameStartPoint} до {NameEndPoint}.");
     }
@@ -122,7 +122,7 @@ public class TicketOffice
 {
     private int _price;
     private int _profit;
-    private Random random = new Random();
+    private Random _random = new Random();
 
     public int QuantityPassengers { get; private set; }
 
@@ -138,17 +138,12 @@ public class TicketOffice
         Console.WriteLine($"Доход составил: {_profit}. Стоимость одного билета: {_price}.");
     }
 
-    public void ShowNumbersPassengers()
-    {
-        Console.WriteLine($"Количество пассажиров: {QuantityPassengers} человек.");
-    }
-
     private void CreatePassengers()
     {
         int minPassengersCount = 20;
         int maxPassengersCount = 70;
 
-        QuantityPassengers = random.Next(minPassengersCount, maxPassengersCount);
+        QuantityPassengers = _random.Next(minPassengersCount, maxPassengersCount);
     }
 
     private void CreatePrice()
@@ -156,12 +151,12 @@ public class TicketOffice
         int minPrice = 500;
         int maxPrice = 1000;
 
-        _price = random.Next(minPrice, maxPrice);
+        _price = _random.Next(minPrice, maxPrice + 1);
     }
 
     private void SumProfit()
     {
-        _profit = _price * QuantityPassengers;
+        _profit = QuantityPassengers * _price ;
     }
 
 }
@@ -172,7 +167,7 @@ public class TrainScheduler
     private bool _isSellTicket = false;
     private bool _isCreateRailwayCarriages = false;
 
-    private Train _trains = new Train();
+    private Train _train = new Train();
     private TicketOffice _office = new TicketOffice();
     private List<Direction> _directions = new List<Direction>();
     private List<Direction> _departedDirections = new List<Direction>();
@@ -284,31 +279,34 @@ public class TrainScheduler
     {
         if(_isCreateRailwayCarriages || _isSellTicket == false)
         {
-            Console.WriteLine("Поезд уже сформирован или билеты еще не проданы.");
+            Console.WriteLine("Вы еще не продали билеты.");
         }
         else
         {
             _isCreateRailwayCarriages = true;
-            _trains.AddWagons(_office.QuantityPassengers);
+            _train.AddWagons(_office.QuantityPassengers);
             Console.WriteLine("Поезд сформирован.");
         }
     }
 
     private void DepartureTarin()
     {
-        if (_isCreateDirection && _isCreateRailwayCarriages && _isSellTicket)
+        if(!_isCreateRailwayCarriages || _isCreateDirection == false)
         {
-            Console.WriteLine("Поезд отправлен!");
-
-            _departedDirections.Add(_directions[_directions.Count - 1]);
-
-            _isCreateDirection = false;
-            _isCreateRailwayCarriages = false;
-            _isSellTicket = false;
+            Console.WriteLine("Невозможно отправить поезд. Проверьте, есть ли направление и вагоны.");
         }
         else
         {
-            Console.WriteLine("Недостаточно информации для отправки поезда.");
+            if(_directions.Count > 0)
+            {
+                Direction direction = _directions[0];
+                _departedDirections.Add(direction);
+                _directions.RemoveAt(0);
+                _isCreateDirection = false;
+                _train.ShowInfo(_office.QuantityPassengers);
+                Console.WriteLine("Поезд отправлен!");
+
+            }
         }
     }
 
@@ -316,7 +314,7 @@ public class TrainScheduler
     {
         if (_isCreateDirection)
         {
-            _directions[_directions.Count - 1].ShowInfoDirection();
+            _directions[_directions.Count - 1].ShowInfo();
         }
     }
 
@@ -324,7 +322,7 @@ public class TrainScheduler
     {
         if (_isCreateRailwayCarriages)
         {
-            _trains.ShowInfo(_office.QuantityPassengers);
+            _train.ShowInfo(_office.QuantityPassengers);
         }
     }
 
@@ -332,7 +330,7 @@ public class TrainScheduler
     {
         if (_isSellTicket)
         {
-            _office.ShowNumbersPassengers();
+            Console.WriteLine($"Количество пассажиров: {_office.QuantityPassengers} человек.");
         }
     }
 
@@ -350,9 +348,9 @@ public class TrainScheduler
         {
             Console.WriteLine("\nСписок отправленных поездов: ");
 
-            foreach (var direction in _departedDirections)
+            foreach (Direction direction in _departedDirections)
             {
-                direction.ShowInfoDirection();
+                direction.ShowInfo();
             }
         }
         else
