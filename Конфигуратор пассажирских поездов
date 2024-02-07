@@ -215,7 +215,7 @@ public class TrainScheduler
                     break;
 
                 case CommandDepartureTrain:
-                    DepartureTarin();
+                    DepartureTrain();
                     break;
 
                 case CommandExit:
