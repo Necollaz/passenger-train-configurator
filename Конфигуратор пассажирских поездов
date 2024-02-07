@@ -250,7 +250,7 @@ public class TrainScheduler
 
             if(userInputEndPoint == userInputStartPoint)
             {
-                Console.WriteLine("Не верный ввод.");
+                Console.WriteLine("Город отправления не может совпадать с городом прибытия.");
             }
             else
             {
