@@ -289,7 +289,7 @@ public class TrainScheduler
         }
     }
 
-    private void DepartureTarin()
+    private void DepartureTrain()
     {
         if(!_isCreateRailwayCarriages || _isCreateDirection == false)
         {
